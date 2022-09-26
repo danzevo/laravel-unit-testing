@@ -3,10 +3,17 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Rules\IsbnOnCreateBookRule;
 
 class PostBookRequest extends FormRequest
 {
+    public function prepareForValidation() {
+        if($this->isbn && is_array($this->isbn))
+            $this->isbn = '';
+
+        $this->merge([
+            'isbn' => $this->isbn,
+        ]);
+    }
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -26,7 +33,7 @@ class PostBookRequest extends FormRequest
     {
         // @TODO implement
         return [
-            'isbn' => [new IsbnOnCreateBookRule(), 'required', 'string', 'unique:books,isbn', 'digits:13'],
+            'isbn' => ['required', 'string', 'unique:books,isbn', 'digits:13'],
             'title' => 'required|string',
             'description' => 'required|string',
             'authors' => 'required|array',
